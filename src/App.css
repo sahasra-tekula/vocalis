@@ -1,0 +1,450 @@
+/* ---------------- GLOBAL STYLES ---------------- */
+
+.App-header {
+  background-color: #fff9ec; /* Light beige background */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: #333;
+  text-align: center;
+  padding: 20px;
+}
+
+/* ---------------- WORD DISPLAY ---------------- */
+
+.word-container {
+  font-size: 64px;
+  font-weight: 800;
+  color: #ff7b00; /* bright orange */
+  margin: 20px;
+  text-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------------- MIC BUTTON ---------------- */
+
+.mic-button {
+  font-size: 1.2rem;
+  border: none;
+  background: #007cff;
+  color: white;
+  padding: 14px 28px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  box-shadow: 0 3px 8px rgba(0, 124, 255, 0.3);
+}
+
+.mic-button:hover {
+  background: #1492ff;
+  transform: scale(1.05);
+}
+
+/* ---------------- FEEDBACK + ENCOURAGEMENT ---------------- */
+
+.feedback-text {
+  margin-top: 15px;
+  font-size: 1.3rem;
+  color: #2b2b2b; /* dark text for contrast */
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.encouragement-text {
+  margin-top: 6px;
+  font-size: 1.2rem;
+  color: #ff9b00; /* bright orange for encouragement */
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  transition: all 0.4s ease;
+}
+
+/* ---------------- STARS ---------------- */
+
+.star-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  font-size: 2rem;
+  margin-top: 15px;
+}
+
+.star.active {
+  text-shadow: 0 0 15px gold;
+  transform: scale(1.3);
+}
+
+/* ---------------- ACCURACY DISPLAY ---------------- */
+
+.accuracy-display.subtle {
+  font-size: 1rem;
+  margin-top: 8px;
+  font-weight: 600;
+  color: #333;
+  opacity: 0.9;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+/* ---------------- NEXT BUTTON ---------------- */
+
+.next-btn {
+  margin-top: 25px;
+  padding: 10px 24px;
+  font-size: 1.1rem;
+  border-radius: 12px;
+  border: none;
+  background-color: #00c896;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s ease;
+  box-shadow: 0 3px 8px rgba(0, 200, 150, 0.3);
+}
+
+.next-btn:hover {
+  background-color: #00e1b2;
+  transform: scale(1.05);
+}
+
+/* ---------------- MENU + PROFILE ---------------- */
+
+button {
+  border: none;
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 18px;
+  background-color: #ffd36b;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background-color: #ffb84d;
+}
+
+/* ---------------- PROGRESS SECTION ---------------- */
+
+.progress-section {
+  background: #fff7e1;
+  border-radius: 20px;
+  padding: 20px;
+  margin: 20px;
+  width: 320px;
+  text-align: left;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.progress-section h3 {
+  color: #ff7b00;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.progress-section li {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: #444;
+}
+
+/* ---------------- CLEAR BUTTON ---------------- */
+
+.clear-button {
+  background: #ff9b85;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 10px;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  margin-top: 20px;
+  transition: 0.3s;
+}
+
+.clear-button:hover {
+  background: #ff6f61;
+}
+
+/* ---------------- PROFILE FORM ---------------- */
+
+.profile-form {
+  background: #fff9ec;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  width: 350px;
+  text-align: left;
+}
+
+.input-group label {
+  font-weight: bold;
+  color: #ff7b00;
+  margin-bottom: 5px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 2px solid #ffd36b;
+  font-size: 16px;
+}
+
+.input-group input:focus {
+  border-color: #ffb84d;
+}
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.avatar-option {
+  font-size: 30px;
+  background: #fff;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  padding: 8px;
+  cursor: pointer;
+  transition: 0.2s;
+  text-align: center;
+}
+
+.avatar-option:hover {
+  background-color: #fff2d4;
+}
+
+.avatar-option.selected {
+  border-color: #ffb84d;
+  background-color: #fff2d4;
+}
+.hear-button {
+  padding: 12px 22px;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 12px;
+  background-color: #ff9b00;
+  color: white;
+  cursor: pointer;
+  transition: 0.3s ease;
+  box-shadow: 0 3px 8px rgba(255, 155, 0, 0.4);
+}
+.hear-button {
+  padding: 12px 22px;
+  font-size: 1.2rem;
+  border: none;
+  border-radius: 12px;
+  background-color: #ff9b00;
+  color: white;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  box-shadow: 0 0 15px rgba(255, 155, 0, 0.4);
+  animation: gentlePulse 2s infinite ease-in-out;
+}
+body {
+  background: linear-gradient(180deg, #fff3d6 0%, #ffe1b2 100%);
+  font-family: 'Poppins', sans-serif;
+}
+.word-container {
+  font-size: 70px;
+  color: #ff6b00;
+  font-weight: 800;
+  animation: float 2s ease-in-out infinite alternate;
+}
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(180deg, #fff3d6 0%, #ffe1b2 100%);
+}
+
+.App-header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #333;
+  text-align: center;
+}
+
+.back-btn {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: #ffd36b;
+  border: none;
+  border-radius: 12px;
+  padding: 10px 20px;
+  cursor: pointer;
+}
+
+.level-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+.progress-bar {
+  width: 200px;
+  height: 8px;
+  background: #ffe4b2;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: #ff8b00;
+  transition: width 0.4s ease;
+}
+
+.mascot {
+  font-size: 4rem;
+  margin: 10px 0;
+}
+
+.word-bubble {
+  font-size: 72px;
+  color: #ff6b00;
+  font-weight: 800;
+  background: #fff4d8;
+  padding: 20px 40px;
+  border-radius: 40px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  margin: 20px 0;
+}
+
+.star-container {
+  font-size: 2rem;
+  margin: 10px 0;
+}
+
+.star.active {
+  text-shadow: 0 0 15px gold;
+  transform: scale(1.2);
+}
+
+.mic-btn, .hear-btn, .next-btn {
+  background: #ffd36b;
+  border: none;
+  border-radius: 15px;
+  padding: 12px 30px;
+  font-size: 20px;
+  margin: 10px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.mic-btn:hover, .hear-btn:hover, .next-btn:hover {
+  background: #ffb84d;
+}
+
+.feedback-banner {
+  background: #fff5da;
+  padding: 10px 20px;
+  border-radius: 15px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+.level-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.level-card {
+  width: 280px;
+  padding: 20px;
+  border-radius: 20px;
+  color: #333;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.level-card:hover {
+  transform: translateY(-5px);
+}
+
+.examples {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 10px 0;
+}
+
+.examples span {
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 10px;
+  padding: 5px 10px;
+  font-weight: bold;
+}
+
+.start-level-btn {
+  background: #ffb84d;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.2s;
+}
+
+.start-level-btn:hover {
+  background: #ffa931;
+}
+
+.encouragement {
+  color: #ff7b00;
+  font-weight: 500;
+  margin-top: 10px;
+}
+
+.accuracy.subtle {
+  font-size: 1.1rem;
+  color: #555;
+  margin-top: 8px;
+}
+
+@keyframes float {
+  from { transform: translateY(0px); }
+  to { transform: translateY(-10px); }
+}
+
+.hear-button:hover {
+  background-color: #ff7b00;
+  transform: scale(1.05);
+}
+
+@keyframes gentlePulse {
+  0% { box-shadow: 0 0 10px rgba(255, 155, 0, 0.4); }
+  50% { box-shadow: 0 0 20px rgba(255, 155, 0, 0.7); }
+  100% { box-shadow: 0 0 10px rgba(255, 155, 0, 0.4); }
+}
+
+.hear-button:hover {
+  background-color: #ff7b00;
+  transform: scale(1.05);
+}
+
+/* ---------------- ANIMATION ---------------- */
+
+@keyframes pop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
