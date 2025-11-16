@@ -3,81 +3,236 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const axios = require('axios');
-const { Formidable } = require('formidable'); // <-- 1. This line is fixed
+const { Formidable } = require('formidable');
 const fs = require('fs');
+const mongoose = require('mongoose');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const authMiddleware = require('./authMiddleware');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const DEEPGRAM_KEY = process.env.DEEPGRAM_KEY;
+// --- Mongoose/MongoDB Setup ---
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => console.log('MongoDB connected successfully.'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
-if (!DEEPGRAM_KEY) {
-  console.error("ERROR: DEEPGRAM_KEY is not set in server/.env file");
-} else {
-  // Good! Add a success message so we know the key is loaded.
+// --- Database Schemas ---
+const UserSchema = new mongoose.Schema({
+  email: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  name: { type: String, required: true },
+  avatar: { type: String, default: '🦜' }
+});
+const User = mongoose.model('User', UserSchema);
+
+const LevelSchema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
+  name: { type: String, required: true },
+  description: { type: String },
+  color: { type: String },
+  words: [{ type: String }]
+});
+const Level = mongoose.model('Level', LevelSchema);
+
+const ProgressSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  word: { type: String, required: true },
+  accuracy: { type: Number, required: true },
+  mastered: { type: Boolean, default: false },
+  level: { type: String },
+  date: { type: Date, default: Date.now }
+});
+const Progress = mongoose.model('Progress', ProgressSchema);
+
+// --- NEW! STREAK CALCULATION HELPER ---
+function calculateStreak(progressEntries) {
+  if (!progressEntries || progressEntries.length === 0) {
+    return 0;
+  }
+  const practiceDays = new Set(
+    progressEntries.map(p => new Date(p.date).toDateString())
+  );
+
+  let streak = 0;
+  let currentDate = new Date();
+
+  if (practiceDays.has(currentDate.toDateString())) {
+    streak++;
+    currentDate.setDate(currentDate.getDate() - 1);
+  } else {
+    currentDate.setDate(currentDate.getDate() - 1);
+    if (practiceDays.has(currentDate.toDateString())) {
+      streak++;
+      currentDate.setDate(currentDate.getDate() - 1);
+    } else {
+      return 0;
+    }
+  }
+  while (practiceDays.has(currentDate.toDateString())) {
+    streak++;
+    currentDate.setDate(currentDate.getDate() - 1);
+  }
+  return streak;
+}
+
+// --- Deepgram API Logic ---
+const DEEPGRAM_KEY = process.env.DEEPGRAM_KEY;
+if (DEEPGRAM_KEY) {
   console.log("DEEPGRAM_KEY loaded successfully.");
+} else {
+  console.error("ERROR: DEEPGRAM_KEY is not set in server/.env file");
 }
 
 app.post('/api/check-speech', async (req, res) => {
-  console.log("Received a request to /api/check-speech"); // Added log
   try {
-    const form = new Formidable({ multiples: false }); // <-- 2. This line is fixed
-
+    const form = new Formidable({ multiples: false });
     form.parse(req, async (err, fields, files) => {
       if (err) {
-        console.error('Error parsing form:', err);
         return res.status(500).json({ error: 'Error parsing audio file' });
       }
-
       const audioBlob = files.audioBlob ? files.audioBlob[0] : null;
-      const currentWord = fields.text ? fields.text[0] : '';
-
       if (!audioBlob) {
-         console.error("No audio file received in form");
          return res.status(400).json({ error: 'No audio file received' });
       }
-      
-      // Check for the key *before* making the API call
       if (!DEEPGRAM_KEY) {
-        console.error("Cannot call Deepgram: DEEPGRAM_KEY is missing.");
         return res.status(500).json({ error: 'Server configuration error' });
       }
-
       try {
-        console.log("Sending audio to Deepgram..."); // Added log
         const deepgramResponse = await axios.post(
           'https://api.deepgram.com/v1/listen?model=general',
           fs.createReadStream(audioBlob.filepath),
-          {
-            headers: {
-              'Authorization': `Token ${DEEPGRAM_KEY}`,
-              'Content-Type': audioBlob.mimetype,
-            },
-          }
+          { headers: { 'Authorization': `Token ${DEEPGRAM_KEY}`, 'Content-Type': audioBlob.mimetype } }
         );
-        
-        console.log("Deepgram response received successfully."); // Added log
-        res.json(deepgramResponse.data); // Send the good response back to React
-
+        res.json(deepgramResponse.data);
       } catch (deepgramError) {
-        // This will catch errors from the Deepgram API itself
         console.error('Error from Deepgram API:', deepgramError.message);
-        if (deepgramError.response) {
-            console.error('Deepgram Response Data:', deepgramError.response.data);
-            console.error('Deepgram Response Status:', deepgramError.response.status);
-        }
         res.status(500).json({ error: 'Deepgram API failed' });
       }
     });
-
   } catch (error) {
-    // This will catch any other errors
     console.error('Outer server error:', error.message);
     res.status(500).json({ error: 'Error processing speech' });
   }
 });
 
+// --- AUTH ENDPOINTS ---
+app.post('/api/auth/signup', async (req, res) => {
+  try {
+    const { name, email, password, avatar } = req.body;
+    let user = await User.findOne({ email });
+    if (user) {
+      return res.status(400).json({ error: "User already exists" });
+    }
+    user = new User({ name, email, password, avatar: avatar || '🦜' });
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+    await user.save();
+    const payload = { user: { id: user.id, name: user.name, avatar: user.avatar } };
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '3h' }, (err, token) => {
+      if (err) throw err;
+      res.status(201).json({ token, user: payload.user });
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: "Invalid credentials" });
+    }
+    const payload = { user: { id: user.id, name: user.name, avatar: user.avatar } };
+    jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '3h' }, (err, token) => {
+      if (err) throw err;
+      res.json({ token, user: payload.user });
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// --- LEVEL ENDPOINTS ---
+app.get('/api/levels', async (req, res) => {
+  try {
+    const levels = await Level.find().select('-words');
+    res.json(levels);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.get('/api/level/:id', async (req, res) => {
+  try {
+    const level = await Level.findOne({ id: req.params.id });
+    if (!level) {
+      return res.status(404).json({ error: 'Level not found' });
+    }
+    res.json(level.words);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// --- PROGRESS ENDPOINTS (MODIFIED FOR STREAK) ---
+app.get('/api/progress', authMiddleware, async (req, res) => {
+  try {
+    const progress = await Progress.find({ user: req.user.id }).sort({ date: -1 });
+    
+    // Calculate the streak
+    const streak = calculateStreak(progress);
+
+    // Send back an object with BOTH progress and streak
+    res.json({
+      progress: progress,
+      streak: streak
+    });
+
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+app.post('/api/progress', authMiddleware, async (req, res) => {
+  try {
+    const { word, accuracy, mastered, level } = req.body;
+    const userId = req.user.id;
+    let progress = await Progress.findOne({ user: userId, word: word });
+
+    if (progress) {
+      progress.accuracy = accuracy;
+      progress.mastered = mastered;
+      progress.level = level;
+      progress.date = Date.now();
+    } else {
+      progress = new Progress({
+        user: userId, word, accuracy, mastered, level,
+        date: new Date().toISOString()
+      });
+    }
+    await progress.save();
+    res.json(progress);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// --- Server Listen ---
 const PORT = 3001;
 app.listen(PORT, () => {
   console.log(`Vocalis server listening on http://localhost:${PORT}`);
