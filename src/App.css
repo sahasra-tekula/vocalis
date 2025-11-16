@@ -451,20 +451,52 @@ body {
   margin-top: 30px;
 }
 
+/* In src/App.css */
+
 .level-card {
   width: 280px;
   padding: 20px;
   border-radius: 20px;
   color: #333;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s;
+  
+  /* Make the shadow slightly softer and more diffuse */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  
+  /* Add a subtle border to give it a defined edge */
+  border: 1px solid rgba(0, 0, 0, 0.03);
+  
+  /* These are needed for the new "sheen" effect */
+  position: relative;
+  overflow: hidden; 
+  
+  /* Make sure the shadow changes on hover, too */
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+/* This ::after pseudo-element adds a "glossy" sheen on top */
+.level-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  /* A very faint white gradient to mimic light hitting a surface */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0) 40%
+  );
+  pointer-events: none; /* So it doesn't block clicks */
+  border-radius: 20px; /* Match the parent's border radius */
 }
 
 .level-card:hover {
   transform: translateY(-5px);
+  /* Make the shadow "grow" a bit when it's "lifted" */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
 }
-
 .examples {
   display: flex;
   justify-content: center;
