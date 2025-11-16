@@ -13,6 +13,8 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token }) {
   const [isTimeAttack, setIsTimeAttack] = useState(selectedLevel === "TIME_ATTACK");
   const [timer, setTimer] = useState(60);
   const [score, setScore] = useState(0);
+  const [botScore, setBotScore] = useState(0);
+  const [botPace] = useState(20);
   const [timeAttackOver, setTimeAttackOver] = useState(false);
 
   const [currentLevel, setCurrentLevel] = useState(selectedLevel);
@@ -116,6 +118,7 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token }) {
       setFeedback("");
       setScore(0);
       setTimer(60);
+      setBotScore(0);
       setLastRecordingURL(null);
 
       if (selectedLevel === "PRACTICE_DECK") {
@@ -187,6 +190,7 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token }) {
       return; 
     }
     const interval = setInterval(() => {
+      setBotScore((b) => b + botPace);
       setTimer((t) => {
         if (t <= 1) {
           clearInterval(interval);
@@ -439,14 +443,26 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token }) {
 
   // Time Attack Game Over Screen
   if (timeAttackOver) {
+    const didWin = score > botScore;
     return (
       <div className="App-header">
-        <h1>⏱️ Time's Up!</h1>
-        <p style={{ fontSize: "1.5rem", margin: "10px" }}>Your Final Score:</p>
-        <div style={{ fontSize: "4rem", fontWeight: "bold", color: "#ff7b00", marginBottom: "10px" }}>
+        {/* --- 4. NEW WIN/LOSE HEADER --- */}
+        {didWin ? (
+          <h1 style={{ color: '#00c896' }}>🎉 You Win! 🎉</h1>
+        ) : (
+          <h1 style={{ color: '#d90429' }}>🤖 Bot Wins!</h1>
+        )}
+        
+        <p style={{ fontSize: '1.5rem', margin: '10px' }}>Your Final Score:</p>
+        <div style={{ fontSize: '4rem', fontWeight: 'bold', color: didWin ? '#00c896' : '#333' }}>
           {score}
         </div>
+
+        <p style={{ fontSize: '1.2rem' }}>Bot's Score: {botScore}</p>
         <p>You got a {maxCombo}-word combo!</p>
+        
+        {/* --- END OF NEW HEADER --- */}
+        
         <button className="next-btn" onClick={onGoToMenu} style={{ marginTop: "30px" }}>
           🏠 Back to Menu
         </button>
