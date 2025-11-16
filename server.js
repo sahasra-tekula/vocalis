@@ -188,17 +188,78 @@ app.get('/api/level/:id', async (req, res) => {
 });
 
 // --- PROGRESS ENDPOINTS (MODIFIED FOR STREAK) ---
+// server.js
+
+// ... (keep all your other code like UserSchema, LevelSchema, etc.) ...
+
+// --- REPLACE your old '/api/progress' endpoint with THIS ---
 app.get('/api/progress', authMiddleware, async (req, res) => {
   try {
-    const progress = await Progress.find({ user: req.user.id }).sort({ date: -1 });
-    
-    // Calculate the streak
-    const streak = calculateStreak(progress);
+    // 1. Get all levels to create a "lookup" for names and colors
+    const levels = await Level.find();
+    const levelInfoMap = new Map();
+    for (const level of levels) {
+      levelInfoMap.set(level.id, {
+        name: level.name,
+        color: level.color || '#DDD',
+      });
+    }
+    levelInfoMap.set("PRACTICE_DECK", {
+        name: "Personalized Practice",
+        color: "#00c896"
+    });
 
-    // Send back an object with BOTH progress and streak
+    // 2. Get ALL user progress entries
+    const allProgressEntries = await Progress.find({ user: req.user.id }).sort({ date: -1 });
+
+    // --- THIS IS THE FIX ---
+    // 3. Filter out the themes you don't want to show
+    const progressEntries = allProgressEntries.filter(p => {
+      // The p.level field holds the theme name (e.g., "1", "Hard Family")
+      return p.level !== "1" && p.level !== "TIME_ATTACK"; // <-- Changed "Level 1" to "1"
+    });
+    // --- END OF FIX ---
+
+    // 4. Calculate streak (using ALL entries, not just filtered ones)
+    const streak = calculateStreak(allProgressEntries);
+
+    // 5. Group the (now filtered) progress entries by their 'level' field
+    const progressByTheme = {};
+
+    for (const p of progressEntries) {
+      const themeId = p.level; 
+      
+      if (!progressByTheme[themeId]) {
+        // Use the themeId itself as the name if not found in map
+        const info = levelInfoMap.get(themeId) || { name: themeId, color: '#CCC' };
+        progressByTheme[themeId] = {
+          themeName: info.name,
+          color: info.color,
+          mastered: [],
+          practiceLater: []
+        };
+      }
+      
+      // Add the word to the correct list
+      if (p.mastered) {
+        if (!progressByTheme[themeId].mastered.includes(p.word)) {
+          progressByTheme[themeId].mastered.push(p.word);
+        }
+      } else {
+        if (!progressByTheme[themeId].practiceLater.includes(p.word)) {
+          progressByTheme[themeId].practiceLater.push(p.word);
+        }
+      }
+    }
+
+    // 6. Convert the grouped object into an array
+    const themedProgress = Object.values(progressByTheme);
+    
+    // 7. Send the new data structure back
     res.json({
-      progress: progress,
-      streak: streak
+      themedProgress: themedProgress,
+      streak: streak,
+      progress: allProgressEntries // Send all entries for average calculation
     });
 
   } catch (err) {
@@ -206,6 +267,8 @@ app.get('/api/progress', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+// ... (the rest of your server.js file) ...
 
 app.post('/api/progress', authMiddleware, async (req, res) => {
   try {
@@ -231,7 +294,27 @@ app.post('/api/progress', authMiddleware, async (req, res) => {
     res.status(500).json({ error: 'Server error' });
   }
 });
+// ... (This is after your app.post('/api/progress', ...) block)
 
+// --- NEW ENDPOINT TO CLEAR PROGRESS ---
+app.delete('/api/progress', authMiddleware, async (req, res) => {
+  try {
+    // Get the user ID from the authentication middleware
+    const userId = req.user.id;
+
+    // Delete all progress entries that match this user's ID
+    await Progress.deleteMany({ user: userId });
+    
+    res.json({ message: 'Progress cleared successfully' });
+
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
+// --- Server Listen ---
+// (Your app.listen(...) code is at the end)
 // --- Server Listen ---
 const PORT = 3001;
 app.listen(PORT, () => {
