@@ -1,7 +1,7 @@
 // src/AuthScreen.js
 import React, { useState } from "react";
 import "./App.css";
-import { motion } from "framer-motion"; // <-- 1. IMPORT MOTION
+import { motion } from "framer-motion";
 
 function AuthScreen({ onLogin }) {
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -17,10 +17,10 @@ function AuthScreen({ onLogin }) {
     e.preventDefault();
     setError("");
 
-    const url = isLoginMode 
-      ? 'http://localhost:3001/api/auth/login'
-      : 'http://localhost:3001/api/auth/signup';
-      
+    const url = isLoginMode
+      ? "http://localhost:3001/api/auth/login"
+      : "http://localhost:3001/api/auth/signup";
+
     const body = isLoginMode
       ? { email, password }
       : { name, email, password, avatar };
@@ -31,37 +31,44 @@ function AuthScreen({ onLogin }) {
 
     try {
       const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
       });
 
       const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Request failed');
-      }
+      if (!res.ok) throw new Error(data.error || "Request failed");
 
       onLogin(data.user, data.token);
-
     } catch (err) {
       setError(err.message);
     }
   };
 
   return (
-    <header className="App-header" style={{paddingTop: '60px'}}> {/* <-- 2. ADD A LITTLE PADDING */}
-      <h1>{isLoginMode ? "🗣️ Welcome Back!" : "🗣️ Create Your Profile"}</h1>
-      <p>{isLoginMode ? "Log in to keep your streak alive!" : "Let’s create your speech buddy profile 💬"}</p>
+    <div className="sky-wrapper">
+      {/* Floating clouds */}
+      <div className="cloud cloud1"></div>
+      <div className="cloud cloud2"></div>
+      <div className="cloud cloud3"></div>
 
-      {/* 3. WRAP FORM AND BUTTON IN MOTION.DIV */}
       <motion.div
-        initial={{ y: 20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.1, type: "spring", stiffness: 150 }}
+        initial={{ opacity: 0, y: 25 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ type: "spring", stiffness: 140 }}
+        className="child-card"
       >
-        <form onSubmit={handleSubmit} className="profile-form">
-          
+        <h1 className="child-title">
+          {isLoginMode ? "👋 Hello There!" : "🎉 Create Your Profile"}
+        </h1>
+
+        <p className="child-subtitle">
+          {isLoginMode
+            ? "Log in to start your speaking adventure!"
+            : "Let's set things up to begin learning!"}
+        </p>
+
+        <form onSubmit={handleSubmit} className="form-container">
           {!isLoginMode && (
             <>
               <div className="input-group">
@@ -73,14 +80,16 @@ function AuthScreen({ onLogin }) {
                   onChange={(e) => setName(e.target.value)}
                 />
               </div>
-              
+
               <div className="input-group">
                 <label>Choose Your Avatar:</label>
                 <div className="avatar-grid">
                   {avatars.map((icon) => (
                     <span
                       key={icon}
-                      className={`avatar-option ${avatar === icon ? "selected" : ""}`}
+                      className={`avatar-option ${
+                        avatar === icon ? "selected-avatar" : ""
+                      }`}
                       onClick={() => setAvatar(icon)}
                     >
                       {icon}
@@ -113,23 +122,24 @@ function AuthScreen({ onLogin }) {
 
           {error && <p className="auth-error-text">{error}</p>}
 
-          <button type="submit" className="start-button">
-            🚀 {isLoginMode ? "Log In" : "Sign Up"}
+          <button type="submit" className="child-btn">
+            {isLoginMode ? "🚀 Log In" : "🎈 Sign Up"}
           </button>
         </form>
-        
-        <button 
+
+        <button
+          className="switch-mode-btn"
           onClick={() => {
             setIsLoginMode(!isLoginMode);
             setError("");
           }}
-          className="auth-toggle-btn" // <-- 4. ADDED A CLASS
         >
-          {isLoginMode ? "Need an account? Sign Up" : "Already have an account? Log In"}
+          {isLoginMode
+            ? "Need an account? Sign Up"
+            : "Already have an account? Log In"}
         </button>
       </motion.div>
-
-    </header>
+    </div>
   );
 }
 
