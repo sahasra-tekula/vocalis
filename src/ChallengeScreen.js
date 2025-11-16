@@ -23,7 +23,7 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token, onS
   const [timer, setTimer] = useState(60);
   const [score, setScore] = useState(0);
   const [botScore, setBotScore] = useState(0);
-  const [botPace] = useState(16);
+  const [botPace] = useState(11);
   const [timeAttackOver, setTimeAttackOver] = useState(false);
   const [feedback, setFeedback] = useState("");
   const [encouragement, setEncouragement] = useState("");
@@ -374,7 +374,6 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token, onS
       setShowConfetti(true);
       setIsLevelComplete(true); // This will show the new buttons
       
-      // THIS IS THE CORRECTED LOGIC from your database screenshot
       if (nextLevelId && nextLevelId !== "null" && nextLevelName && nextLevelName !== "null") {
         setFeedback(`🏁 Level Complete!`);
       } else if (selectedLevel === "PRACTICE_DECK") {
@@ -462,8 +461,13 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token, onS
         {/* --- BUTTON & CONTENT LOGIC CONTAINER --- */}
         <div className="button-controls-container" style={{display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%'}}>
           
-          {/* --- A) While level is IN PROGRESS --- */}
-          {!isLevelComplete && !isTimeAttack && (
+          {/* --- THIS IS THE FIX ---
+            Show the game UI if:
+            1. (It's NOT Time Attack AND the level is NOT complete)
+            OR
+            2. (It IS Time Attack)
+          */}
+          {((!isTimeAttack && !isLevelComplete) || isTimeAttack) && (
             <>
               <motion.div className="word-bubble" initial={{ scale: 0 }} animate={{ scale: 1 }}>
                 {currentWord}
@@ -494,9 +498,12 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token, onS
                 </AnimatePresence>
               </div>
 
-              <div className="star-container">
-                {[1, 2, 3].map((s) => ( <span key={s} className={s <= stars ? "star active" : "star"}>⭐</span> ))}
-              </div>
+              {/* Stars are hidden in Time Attack */}
+              {!isTimeAttack && (
+                <div className="star-container">
+                  {[1, 2, 3].map((s) => ( <span key={s} className={s <= stars ? "star active" : "star"}>⭐</span> ))}
+                </div>
+              )}
               
               {isRecording && <canvas ref={canvasRef} width={200} height={60} style={{ margin: "10px 0" }} />}
               
@@ -505,36 +512,35 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token, onS
               </button>
               
               <div className="button-row" style={{ display: "flex", gap: "15px", marginTop: "10px" }}>
-                {showHearIt && ( <motion.button onClick={handleHearIt} className="hear-btn" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>👂 Hear It</motion.button> )}
-                {lastRecordingURL && ( <motion.button onClick={() => new Audio(lastRecordingURL).play()} className="playback-btn" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>🎧 Play My Audio</motion.button> )}
+                {/* "Hear It" and "Play My Audio" are hidden in Time Attack */}
+                {!isTimeAttack && showHearIt && ( <motion.button onClick={handleHearIt} className="hear-btn" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>👂 Hear It</motion.button> )}
+                {!isTimeAttack && lastRecordingURL && ( <motion.button onClick={() => new Audio(lastRecordingURL).play()} className="playback-btn" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>🎧 Play My Audio</motion.button> )}
               </div>
               
               {feedback && <motion.div className="feedback-banner" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>{feedback}</motion.div>}
               {encouragement && <motion.p className="encouragement" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{encouragement}</motion.p>}
               {accuracyValue !== null && <motion.p className="accuracy subtle" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>Accuracy: {accuracyValue}%</motion.p>}
               
-              {!isRecording && !showHearIt && (
+              {/* "Next" button is hidden in Time Attack */}
+              {!isRecording && !showHearIt && !isTimeAttack && (
                 <button className="next-btn" onClick={nextWord}>Next ⏭️</button>
               )}
             </>
           )}
 
-          {/* --- B) When level is COMPLETE --- */}
+          {/* --- B) When level is COMPLETE (and NOT Time Attack) --- */}
           {isLevelComplete && !isTimeAttack && (
             <>
               {feedback && <motion.div className="feedback-banner" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} style={{fontSize: '1.5rem', padding: '20px', margin: '50px 0'}}>{feedback}</motion.div>}
               
-              {/* --- THIS IS THE FINAL FIX --- */}
               <motion.div 
                 style={{ display: 'flex', gap: '15px', marginTop: '20px' }}
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                {/* THIS IS THE FIX:
-                  It now checks if nextLevelId and nextLevelName are "truthy" 
-                  AND that they are not equal to the string "null".
-                  This will correctly show "Back to Menu" when the level ends.
+                {/* THIS IS THE "GO TO NULL" FIX:
+                  It now checks if nextLevelId AND nextLevelName are valid (not null and not the string "null").
                 */}
                 {nextLevelId && nextLevelId !== "null" && nextLevelName && nextLevelName !== "null" ? (
                   <button 
@@ -555,12 +561,10 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token, onS
                   View My Progress 📊
                 </button>
               </motion.div>
-              {/* --- END OF FINAL FIX --- */}
             </>
           )}
           
         </div>
-
       </header>
     </div>
   );
