@@ -7,6 +7,7 @@ import MainMenu from "./MainMenu";
 import ChallengeScreen from "./ChallengeScreen";
 import ProgressScreen from "./ProgressScreen";
 import LevelSelect from "./LevelSelect";
+import LeaderboardScreen from "./LeaderboardScreen"; // <-- 1. IMPORT
 
 function App() {
   const [currentScreen, setCurrentScreen] = useState("AUTH"); 
@@ -32,6 +33,7 @@ function App() {
   const handleStartChallenge = () => setCurrentScreen("LEVEL_SELECT");
   const handleShowProgress = () => setCurrentScreen("PROGRESS");
   const handleGoToMenu = () => setCurrentScreen("MENU");
+  const handleShowLeaderboard = () => setCurrentScreen("LEADERBOARD"); // <-- 2. ADD HANDLER
   
   const handleLogout = () => {
     setUser(null);
@@ -77,6 +79,7 @@ function App() {
               token={token}
               onStartChallenge={handleStartChallenge}
               onShowProgress={handleShowProgress}
+              onShowLeaderboard={handleShowLeaderboard} // <-- 3. PASS HANDLER
               onLogout={handleLogout}
             />
           </motion.div>
@@ -98,6 +101,7 @@ function App() {
               token={token}
               onGoToMenu={handleGoToLevelSelect} 
               onGoToProgress={handleShowProgress}
+              onShowLeaderboard={handleShowLeaderboard} // <-- 4. ADD THIS PROP
               selectedLevel={selectedLevel}
               onSelectLevel={handleSelectLevel} 
             />
@@ -109,6 +113,15 @@ function App() {
           <motion.div key="progress" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition} style={{ width: '100%', position: 'absolute' }}>
             <ProgressScreen 
               token={token}
+              onGoToMenu={handleGoToMenu} 
+            />
+          </motion.div>
+        )}
+
+        {/* --- ADD NEW CASE FOR LEADERBOARD --- */}
+        {currentScreen === "LEADERBOARD" && (
+          <motion.div key="leaderboard" initial="initial" animate="in" exit="out" variants={pageVariants} transition={pageTransition} style={{ width: '100%', position: 'absolute' }}>
+            <LeaderboardScreen
               onGoToMenu={handleGoToMenu} 
             />
           </motion.div>
