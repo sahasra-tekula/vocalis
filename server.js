@@ -82,11 +82,11 @@ mongoose.connection.once('open', () => {
       const existingLevel = await Level.findOne({ id: pictureLevelId });
 
       const newWords = [
-        { text: "CAT", image: "https://i.ibb.co/N7FwP1p/cat-icon.png" },
-        { text: "DOG", image: "https://i.ibb.co/wK40sS1/dog-icon.png" },
-        { text: "CAR", image: "https://i.ibb.co/dJtW3s6/car-icon.png" },
-        { text: "TREE", image: "https://i.ibb.co/fQ2B01Q/tree-icon.png" },
-        { text: "FISH", image: "https://i.ibb.co/yBNP21h/fish-icon.png" }
+        { text: "CAT", image: "https://i.guim.co.uk/img/media/327aa3f0c3b8e40ab03b4ae80319064e401c6fbc/377_133_3542_2834/master/3542.jpg?width=620&dpr=2&s=none&crop=none" },
+        { text: "DOG", image: "https://images.squarespace-cdn.com/content/v1/54822a56e4b0b30bd821480c/45ed8ecf-0bb2-4e34-8fcf-624db47c43c8/Golden+Retrievers+dans+pet+care.jpeg" },
+        { text: "CAR", image: "https://imgd.aeplcdn.com/600x337/n/cw/ec/130595/xev-9e-exterior-right-front-three-quarter.jpeg?isig=0&q=80" },
+        { text: "TREE", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTrWGnkEWaaNZjJTYAVRWZwi1ehw0muzeOnwg&s" },
+        { text: "FISH", image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQXUm5fqPjYJ1ZQPiPphFH0BocpO412ECODSw&s" }
       ];
 
       if (existingLevel) {
