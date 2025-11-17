@@ -43,6 +43,8 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token, onS
   const [combo, setCombo] = useState(0);
   const [maxCombo, setMaxCombo] = useState(0);
   const [lastRecordingURL, setLastRecordingURL] = useState(null);
+  // --- NEW STATE ADDED HERE ---
+  const [isCorrect, setIsCorrect] = useState(false); 
 
   const encouragements = [
     "You’re doing great! Let’s try once more 💪",
@@ -354,7 +356,7 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token, onS
     }
   };
 
-  // --- handleResult Function ---
+  // --- handleResult Function (MODIFIED) ---
   const handleResult = (acc) => {
     if (timeAttackOver) return; 
     
@@ -375,6 +377,7 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token, onS
         setTimer((t) => t + 2);
         setTimeout(loadNextWord, 400);
       } else {
+        setIsCorrect(true); // <--- SET CORRECT HERE
         setEncouragement("");
         setShowConfetti(true);
         setTimeout(() => nextWord(), 2500); 
@@ -386,6 +389,7 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token, onS
       setFeedback("💬 Try again!");
       setStars(acc > 50 ? 2 : acc > 0 ? 1 : 0);
       setCombo(0); 
+      setIsCorrect(false); // <--- RESET CORRECT HERE
       saveProgress(currentWord, acc);
 
       if (isTimeAttack) {
@@ -411,9 +415,10 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token, onS
     setStars(0);
     setAccuracyValue(null);
     setLastRecordingURL(null);
+    setIsCorrect(false); // <--- RESET CORRECT ON NEXT WORD LOAD
   };
 
-  // --- nextWord FUNCTION (for Normal Mode) ---
+  // --- nextWord FUNCTION (for Normal Mode - MODIFIED) ---
   const nextWord = () => {
     const next = currentIndex + 1;
     
@@ -443,6 +448,7 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token, onS
     setShowHearIt(false);
     setIsAfterHear(false);
     setLastRecordingURL(null);
+    setIsCorrect(false); // <--- RESET CORRECT HERE
   };
 
   // --- handleHearIt function ---
@@ -495,7 +501,7 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token, onS
     );
   }
 
-  // --- MAIN RENDER ---
+  // --- MAIN RENDER (MODIFIED) ---
   return (
     <div className="game-wrapper">
       {showConfetti && !isTimeAttack && <Confetti width={width} height={height} numberOfPieces={150} gravity={0.3} tweenDuration={6000} recycle={false} />}
@@ -546,8 +552,18 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token, onS
 
               {/* If picture round, show a ? bubble, else show combo */}
               {isPictureRound && !isRecording ? (
-                <motion.div className="word-bubble-small" initial={{ scale: 0 }} animate={{ scale: 1 }}>
-                  ?
+                <motion.div 
+                  className="word-bubble-small" 
+                  key={isCorrect ? "check" : "q"} // Key ensures animation on change
+                  initial={{ scale: 0 }} 
+                  animate={{ scale: 1 }}
+                >
+                  {/* MODIFIED: Check if correct */}
+                  {isCorrect ? (
+                    <span role="img" aria-label="correct">✅</span>
+                  ) : (
+                    '?'
+                  )}
                 </motion.div>
               ) : (
                 <div style={{ height: "40px", marginBottom: "10px" }}>
