@@ -614,7 +614,7 @@ function ChallengeScreen({ onGoToMenu, onGoToProgress, selectedLevel, token, onS
               {encouragement && <motion.p className="encouragement" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>{encouragement}</motion.p>}
               {accuracyValue !== null && <motion.p className="accuracy subtle" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>Accuracy: {accuracyValue}%</motion.p>}
               
-              {!isRecording && !showHearIt && !isTimeAttack && (
+              {!isRecording && !isTimeAttack && (
                 <button className="next-btn" onClick={nextWord}>Next ⏭️</button>
               )}
             </>
