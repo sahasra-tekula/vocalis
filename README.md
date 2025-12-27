@@ -1,70 +1,56 @@
-# Getting Started with Create React App
+# Vocalis 🗣️
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+**Vocalis** is an AI-powered speech therapy and language learning platform designed specifically for children. Developed during a hackathon, this project provides an interactive, gamified environment to help young users improve their pronunciation and vocabulary through real-time feedback and engaging mechanics.
 
-## Available Scripts
+## 🚀 Key Features
 
-In the project directory, you can run:
+* **Voice-Controlled Gameplay**: Integrated with the **Deepgram API** for real-time speech-to-text processing and pronunciation accuracy scoring.
+* **Spaceship Revision Game**: A specialized game engine where users destroy word-obstacles by correctly pronouncing them, featuring dynamic physics, laser mechanics, and an immersive parallax star background.
+* **Visual Learning (Picture Rounds)**: A dedicated mode that uses high-quality images instead of text to prompt speech, aiding pre-literate or visual learners.
+* **Gamified Achievements**: A full-stack achievement system that rewards users with titles like "Word Wizard" and "Visual Learner" based on mastery and practice streaks.
+* **Progress Tracking & Leaderboards**: Full-stack integration with **MongoDB** to track user performance, including accuracy percentages, mastered words, and competitive scores.
 
-### `npm start`
+## 🛠️ Tech Stack
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+* **Frontend**: React.js, Framer Motion (animations), CSS3 (Custom game engines).
+* **Backend**: Node.js, Express.
+* **Database**: MongoDB (Mongoose).
+* **APIs**: Deepgram (Speech-to-Text).
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 👥 My Contributions (sahasra-tekula)
 
-### `npm test`
+As a core developer during the hackathon, I was responsible for the following:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+* **Game Engine Development**: Built the core logic for the **Spaceship Revision Game**, including collision detection, laser firing mechanics, and responsive keyboard/voice controls.
+* **Full-Stack Achievement System**: Designed the MongoDB schemas and backend logic to automatically calculate and award achievements based on user performance data.
+* **UI/UX Redesign**: Revitalized the **Main Menu** with a child-friendly aesthetic and implemented the "child-friendly sky" UI theme across the application.
+* **Feature Refinement**: Fixed critical logic bugs in the "Hear It" mode and updated the **Challenge Screen** to improve user engagement and retry-count accuracy.
+* **API & Auth Integration**: Implemented backend endpoints for audio processing and fixed critical authentication typos to ensure stable user signups.
 
-### `npm run build`
+## ⚙️ Setup & Installation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. **Clone the Repository**:
+```bash
+git clone https://github.com/sahasra-tekula/vocalis.git
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
+2. **Environment Variables**:
+Create a `.env` file in the `server` directory and add the following:
+* `DEEPGRAM_KEY`: Your Deepgram API token.
+* `MONGODB_URI`: Your MongoDB connection string.
+* `JWT_SECRET`: A secret key for authentication.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+3. **Install Dependencies**:
+```bash
+npm install
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+```
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-## Learn More
+4. **Run the Project**:
+* **Frontend**: `npm start` (Runs on Port 3000).
+* **Backend**: Ensure the server is running on Port 3001.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
